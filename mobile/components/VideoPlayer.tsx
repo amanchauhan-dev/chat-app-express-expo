@@ -16,6 +16,7 @@ export default function VideoScreen() {
     <View >
       <VideoView style={{
         width: Dimensions.get('window').width - 100,
+        backgroundColor:'transparent',
         height: 200
       }} player={player} allowsFullscreen allowsPictureInPicture />
     </View>
