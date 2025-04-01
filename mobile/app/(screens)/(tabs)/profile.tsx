@@ -5,7 +5,9 @@ import { Image, TextInput, View } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import AvatarImage from '@/assets/images/image1.jpg';
 import { Link } from 'expo-router';
+import { useAppSelector } from '@/hooks/useRedux';
 export default function ProfileScreen() {
+  const { user } = useAppSelector(s => s.auth)
   return (
     <ScreenView>
       <View className='p-4 mt-4 flex'>
@@ -18,9 +20,9 @@ export default function ProfileScreen() {
           </View>
           {/* details */}
           <View className='flex gap-0 justify-center'>
-            <ThemedText className='!text-2xl  font-bold'>John Doe</ThemedText>
-            <ThemedText className='font-bold '>john.doe</ThemedText>
-            <ThemedText className='!text-lg  font-bold'>john.doe@gmail.com
+            <ThemedText className='!text-2xl  font-bold'>{user?.name}</ThemedText>
+            <ThemedText className='font-bold '>{user?.username}</ThemedText>
+            <ThemedText className='!text-lg  font-bold'>{user?.email}
               <Link href="/edit-profile">
                 {" "} <MaterialIcons name="mode-edit-outline" size={20} color="green" />
               </Link></ThemedText>
@@ -36,10 +38,7 @@ export default function ProfileScreen() {
             borderColor: '#27272a'
           }]}
             multiline
-            defaultValue='Lorem ipsum dolor sit amet
-            consectetur adipisicing elit. Pariatur magni incidunt modi deleniti quia
-            labore deserunt vitae neque natus officia cupiditate esse eveniet
-            veritatis ullam amet, numquam, eos odit in 😇🧑‍🎓.'/>
+            defaultValue={user?.bio} />
         </View>
 
       </View>

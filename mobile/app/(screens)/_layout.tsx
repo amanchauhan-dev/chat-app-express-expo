@@ -1,12 +1,12 @@
-import { Stack, useNavigation, useRouter, useSegments } from 'expo-router';
+import { Stack, useNavigation, useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useContext, useEffect, useState } from 'react';
-import { AuthContext } from '@/context/AuthContext';
+import { useEffect, useState } from 'react';
+import { useAppSelector } from '@/hooks/useRedux';
 
 export default function ScreenLayout() {
-  const auth = useContext(AuthContext);
+  const auth = useAppSelector(state => state.auth);
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
 
@@ -19,13 +19,13 @@ export default function ScreenLayout() {
   useEffect(() => {
     if (!isMounted) return;
     // Redirect to login if not authenticated
-    if (auth?.login === false) {
+    if (auth.isAuthenticated === false) {
       router.replace("/login");
     }
-  }, [auth?.login, isMounted]);
+  }, [auth.isAuthenticated, isMounted]);
 
   // loading state
-  if (!isMounted || auth?.login === undefined) {
+  if (!isMounted || auth.isAuthenticated === undefined) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" color="#0000ff" />
@@ -33,7 +33,7 @@ export default function ScreenLayout() {
     );
   }
 
-  if (!auth?.login) return null
+  if (!auth.isAuthenticated) return null
   //  authenticated
   return (
     <Stack

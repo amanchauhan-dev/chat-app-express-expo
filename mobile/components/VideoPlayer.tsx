@@ -1,6 +1,6 @@
 import { useEvent } from 'expo';
 import { useVideoPlayer, VideoView } from 'expo-video';
-import { View, Button, Dimensions } from 'react-native';
+import { View, Dimensions } from 'react-native';
 
 import ved from "@/assets/video.mp4"
 
