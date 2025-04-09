@@ -63,23 +63,33 @@ export const loginUser = async (req: Request, res: Response) => {
     return;
   }
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const { username, password } = req.body;
+    const user = await User.findOne({
+      $or: [{ username: username }, { email: username }],
+    });
 
     if (user && (await bcrypt.compare(password, user.password))) {
       res.json({
-        _id: user.id,
-        username: user.username,
-        email: user.email,
+        user: {
+          _id: user._id,
+          name: user.name,
+          username: user.username,
+          email: user.email,
+          avatar: user.avatar,
+          bio: user.bio,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        },
         token: generateToken(user.id),
       });
     } else {
-      res.status(401).json({ message: "Invalid email or password" });
+      res.status(401).json({ message: "Invalid username or password" });
     }
   } catch (error) {
     res.status(500).json({ message: "Error logging in" });
   }
 };
+
 export const getAll = async (req: Request, res: Response) => {
   try {
     const user = await User.find();

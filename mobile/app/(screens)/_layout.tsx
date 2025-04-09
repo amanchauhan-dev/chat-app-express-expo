@@ -3,37 +3,52 @@ import * as Haptics from 'expo-haptics';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
-import { useAppSelector } from '@/hooks/useRedux';
+import { useAppDispatch, useAppSelector } from '@/hooks/useRedux';
+import { getUserData } from '@/database/authStorage';
+import { getToken } from '@/database/secureStorage';
+import { login, UserType } from '@/libs/store/authSlice';
 
 export default function ScreenLayout() {
-  const auth = useAppSelector(state => state.auth);
   const router = useRouter();
+  const [auth, setAuth] = useState<boolean>(false)
   const [isMounted, setIsMounted] = useState(false);
-
+  const dispatch = useAppDispatch()
   // Ensures component is mounted before redirection
   useEffect(() => {
+    checkLoginStatus()
     setIsMounted(true);
   }, []);
 
   // Prevent navigation before mount
-  useEffect(() => {
-    if (!isMounted) return;
-    // Redirect to login if not authenticated
-    if (auth.isAuthenticated === false) {
-      router.replace("/login");
+  const checkLoginStatus = async () => {
+    try {
+      console.log('Getting data');
+      const userData = await getUserData();
+      const token = await getToken();
+      if (userData && token) {
+        dispatch(login({ user: userData, token, isAuthenticated: true }));
+        console.log(userData);
+        setAuth(true)
+        setIsMounted(true)
+        return
+      } else {
+        setAuth(false)
+      }
+    } catch (error) {
+      setAuth(false)
     }
-  }, [auth.isAuthenticated, isMounted]);
-
-  // loading state
-  if (!isMounted || auth.isAuthenticated === undefined) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
   }
+  useEffect(() => {
+    if (isMounted == false) {
+      return
+    }
+    if (auth == false) {
+      console.log('redirected');
+      router.navigate('/login')
+    }
+  }, [isMounted, auth]);
 
-  if (!auth.isAuthenticated) return null
+  if (!isMounted==false ) return null
   //  authenticated
   return (
     <Stack
@@ -52,7 +67,6 @@ export default function ScreenLayout() {
     </Stack>
   );
 }
-
 
 
 

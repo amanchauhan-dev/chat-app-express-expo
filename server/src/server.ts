@@ -10,7 +10,7 @@ dotenv.config();
 connectDB();
 
 const app = express();
-app.use(cors({ origin: ["http://192.168.131.187:5000", "exp://192.168.131.187:5000"] }));
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 
 // ✅ Ensure correct middleware usage

@@ -1,6 +1,9 @@
+import { UserType } from "@/libs/store/authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export const saveUserData = async (user: any) => {
+// user data
+
+export const saveUserData = async (user: UserType) => {
   await AsyncStorage.setItem("user_data", JSON.stringify(user));
 };
 

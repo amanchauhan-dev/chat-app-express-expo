@@ -10,6 +10,9 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import api from "@/libs/axios";
+import { login, UserType } from "@/libs/store/authSlice";
+import { saveToken } from "@/database/secureStorage";
+import { saveUserData } from "@/database/authStorage";
 
 const loginSchema = z.object({
     username: z.string({ required_error: 'Username or email is required' }).min(4, 'username is too short'),
@@ -27,36 +30,23 @@ const LoginScreen = () => {
     const auth = useAppSelector(s => s.auth)
     const router = useRouter();
     const [passView, setPassView] = useState<boolean>(true)
-    const [loading, setLoading] = useState(false);
-    if (!auth) return null; // Ensure auth is not undefined
+    const [loading, setLoading] = useState<boolean>(false);
 
+    if (!auth) return null; // Ensure auth is not undefined
+    
     const handleLogin = async (formData: FormData) => {
         try {
             setLoading(true)
-            // const { data } = await api.post('/auth/login', formData)
-            const { data } = await api.get('/auth/users')
-            console.log(data);
+            const { data } = await api.post('/auth/login', formData)
+            await saveUserData(data?.user)
+            await saveToken(data?.token)
+            dispatch(login({ user: data?.user, token: data?.token, isAuthenticated: true }))
+            router.navigate('/(screens)/(tabs)')
         } catch (error: any) {
-            console.log(error);
+            console.error(error.message)
         } finally {
             setLoading(false)
         }
-        // login
-        // dispatch(login({
-        //     user: {
-        //         id: "12",
-        //         name: 'John Doe',
-        //         username: 'john.doe',
-        //         email: 'john.doe@gmail.com',
-        //         create_at: "23 feb 2023",
-        //         updated_at: "24 feb 2023",
-        //         bio: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur magni incidunt modi deleniti qui labore deserunt vitae neque natus officia cupiditate esse eveniet veritatis ullam amet, numquam, eos odit in 😇🧑‍🎓.",
-        //         avatar: ""
-        //     },
-        //     isAuthenticated: true,
-        //     token: "token"
-        // }))
-        // router.replace("/(screens)/(tabs)"); // Redirect after login
     };
 
 
@@ -77,7 +67,8 @@ const LoginScreen = () => {
             <View className="" style={{ width: Dimensions.get('window').width - 80 }}>
                 {loading ? (
                     <ActivityIndicator size="large" color="blue" />
-                ) : <Button onPress={handleSubmit(handleLogin)} className="w-full p-3 py-2 text-center">LOGIN</Button>}
+                ) : <Button onPress={handleSubmit(handleLogin)} className="w-full p-3 py-2 text-center">LOGIN</Button>
+                }
             </View>
             <View className="" style={{ width: Dimensions.get('window').width - 80 }}>
                 <ThemedText>Don't have a account? <Link href={'/register'} className="text-green-600 ml-3">Register here</Link></ThemedText>
