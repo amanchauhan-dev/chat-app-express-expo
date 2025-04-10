@@ -1,4 +1,4 @@
 
 export default function page() {
-    return null 
+    return <div>Chat App</div> 
 }
