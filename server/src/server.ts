@@ -33,6 +33,13 @@ io.on("connection", (socket) => {
   });
 });
 
+
+app.get("/", (req, res) => {
+  res.send("Server is running 🚀");
+}
+);
+
+
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT} 🚀\nurl:http://127.0.0.1:${PORT} 🚀`)
